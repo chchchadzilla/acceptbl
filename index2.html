@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chad Keith | AI Developer & Former Metal Drummer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.2/vanilla-tilt.min.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ff0000;
+            --secondary: #000000;
+            --accent: #333333;
+            --dark: #000000;
+            --light: #ffffff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none;
+        }
+        
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: var(--dark);
+            color: var(--light);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+        }
+        
+        .custom-cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            mix-blend-mode: difference;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0s ease;
+        }
+        
+        .cursor-follower {
+            position: fixed;
+            width: 32px;
+            height: 32px;
+            border: 2px solid var(--secondary);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            transition: all 0.2s ease;
+        }
+        
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        .three-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+        }
+        
+        .nav-link {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            transform: translateX(0);
+        }
+        
+        .floating-card {
+            transition: all 0.4s ease;
+            transform-style: preserve-3d;
+        }
+        
+        .floating-card:hover {
+            transform: translateY(-10px) rotate3d(1, 1, 0, 5deg);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(45deg, var(--primary), #ffffff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 300% 300%;
+            animation: gradient 5s ease infinite;
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .glow {
+            box-shadow: 0 0 20px rgba(255, 0, 60, 0.5);
+        }
+        
+        .tilt-card {
+            transform-style: preserve-3d;
+            transform: perspective(1000px);
+        }
+        
+        .section-title {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 3rem;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+        
+        .skill-bar {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .skill-progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .skill-progress::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: shine 2s infinite;
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-left: 3rem;
+            margin-bottom: 3rem;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+        }
+        
+        .timeline-dot {
+            position: absolute;
+            left: -10px;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--secondary);
+            box-shadow: 0 0 10px var(--secondary);
+        }
+        
+        .project-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 15px;
+            transform-style: preserve-3d;
+        }
+        
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 0, 60, 0.2), rgba(0, 217, 255, 0.2));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .project-card:hover::before {
+            opacity: 1;
+        }
+        
+        .project-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 2rem;
+            background: linear-gradient(transparent, rgba(10, 10, 24, 0.9));
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .project-card:hover .project-overlay {
+            transform: translateY(0);
+        }
+        
+        .animated-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+            background: 
+                radial-gradient(circle at 20% 30%, var(--primary), transparent 25%),
+                radial-gradient(circle at 80% 70%, var(--secondary), transparent 25%),
+                radial-gradient(circle at 40% 80%, var(--accent), transparent 25%);
+            animation: bgMove 20s infinite alternate;
+        }
+        
+        @keyframes bgMove {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-5%, 5%) scale(1.1); }
+            100% { transform: translate(5%, -5%) scale(1); }
+        }
+        
+        .floating {
+            animation: floating 6s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 0, 60, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(255, 0, 60, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 0, 60, 0); }
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .custom-cursor, .cursor-follower {
+                display: none;
+            }
+            
+            * {
+                cursor: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Custom Cursor -->
+    <div class="custom-cursor"></div>
+    <div class="cursor-follower"></div>
+    
+    <!-- Particles Background -->
+    <div id="particles-js"></div>
+    
+    <!-- Three.js Background -->
+    <div class="three-bg" id="three-bg"></div>
+    
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 bg-opacity-90 backdrop-blur-md bg-[#0a0a18] border-b border-gray-800">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <a href="#hero" class="text-2xl font-bold gradient-text nav-link">CHAD KEITH</a>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#about" class="text-white hover:text-[#ff003c] transition-colors nav-link">ABOUT</a>
+                    <a href="#projects" class="text-white hover:text-[#00d9ff] transition-colors nav-link">PROJECTS</a>
+                    <a href="#experience" class="text-white hover:text-[#9d00ff] transition-colors nav-link">EXPERIENCE</a>
+                    <a href="#education" class="text-white hover:text-[#ff003c] transition-colors nav-link">EDUCATION</a>
+                    <a href="#contact" class="text-white hover:text-[#00d9ff] transition-colors nav-link">CONTACT</a>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-white">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="fixed top-0 left-0 w-full h-full bg-[#0a0a18] z-40 transform -translate-y-full transition-transform duration-300 md:hidden">
+        <div class="container mx-auto px-6 py-20">
+            <div class="flex flex-col space-y-8 text-center">
+                <a href="#about" class="text-2xl text-white hover:text-[#ff003c] transition-colors py-4">ABOUT</a>
+                <a href="#projects" class="text-2xl text-white hover:text-[#00d9ff] transition-colors py-4">PROJECTS</a>
+                <a href="#experience" class="text-2xl text-white hover:text-[#9d00ff] transition-colors py-4">EXPERIENCE</a>
+                <a href="#education" class="text-2xl text-white hover:text-[#ff003c] transition-colors py-4">EDUCATION</a>
+                <a href="#contact" class="text-2xl text-white hover:text-[#00d9ff] transition-colors py-4">CONTACT</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Hero Section -->
+    <section id="hero" class="top-20 min-h-screen flex items-center justify-center relative overflow-hidden">
+        <div class="animated-bg"></div>
+        <div class="container mx-auto px-6 text-center z-10">
+            <div class="floating mb-8">
+                <img src="" alt="Chad Keith" class="w-40 h-40 mx-auto rounded-full glow">
+            </div>
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 gradient-text">CHAD KEITH</h1>
+            <h2 class="text-2xl md:text-3xl mb-8 text-gray-300">AI Full-Stack Developer & Former Thrash Metal Drummer</h2>
+            <div class="max-w-3xl mx-auto">
+                <p class="text-xl mb-10 text-gray-400">Building the future of AI with a rhythm forged on stage and refined in the boardroom</p>
+                <div class="flex justify-center space-x-6">
+                    <a href="#projects" class="px-8 py-3 bg-gradient-to-r from-[#ff003c] to-[#9d00ff] rounded-full text-white font-bold hover:shadow-lg hover:shadow-[#ff003c]/50 transition-all">VIEW WORK</a>
+                    <a href="#contact" class="px-8 py-3 border-2 border-[#00d9ff] rounded-full text-[#00d9ff] font-bold hover:bg-[#00d9ff] hover:bg-opacity-10 transition-all">CONTACT ME</a>
+                </div>
+            </div>
+        </div>
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <a href="#about" class="text-4xl text-[#00d9ff]">↓</a>
+        </div>
+    </section>
+    
+    <!-- About Section -->
+    <section id="about" class="py-20 relative overflow-hidden">
+        <div class="animated-bg"></div>
+        <div class="container mx-auto px-6 z-10">
+            <h2 class="text-4xl font-bold mb-16 text-center section-title">ABOUT ME</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="floating-card tilt-card bg-[#101028] p-8 rounded-2xl glow">
+                    <h3 class="text-2xl font-bold mb-6 gradient-text">The Unconventional Path</h3>
+                    <p class="mb-4">From thrash metal stages to international business operations and now cutting-edge AI development, my journey has been anything but conventional.</p>
+                    <p class="mb-4">As a former touring musician, I learned the discipline of practice and the art of performance. As a business operations director managing international teams, I mastered the science of efficiency and human dynamics.</p>
+                    <p>Now, as an AI developer, I combine these diverse experiences to create technology that understands people in ways that pure technologists often miss.</p>
+                </div>
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="floating-card bg-[#101028] p-6 rounded-2xl text-center glow">
+                        <div class="text-5xl font-bold mb-2 gradient-text">10+</div>
+                        <div class="text-gray-400">Years in Business Operations</div>
+                    </div>
+                    <div class="floating-card bg-[#101028] p-6 rounded-2xl text-center glow">
+                        <div class="text-5xl font-bold mb-2 gradient-text">15+</div>
+                        <div class="text-gray-400">Years as a Musician</div>
+                    </div>
+                    <div class="floating-card bg-[#101028] p-6 rounded-2xl text-center glow">
+                        <div class="text-5xl font-bold mb-2 gradient-text">5</div>
+                        <div class="text-gray-400">Departments Managed</div>
+                    </div>
+                    <div class="floating-card bg-[#101028] p-6 rounded-2xl text-center glow">
+                        <div class="text-5xl font-bold mb-2 gradient-text">4</div>
+                        <div class="text-gray-400">Countries Worked In</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Projects Section -->
+    <section id="projects" class="py-20 relative overflow-hidden">
+        <div class="animated-bg"></div>
+        <div class="container mx-auto px-6 z-10">
+            <h2 class="text-4xl font-bold mb-16 text-center section-title">PROJECTS</h2>
+            
+            <!-- ConversaTrait -->
+            <div class="mb-32">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
+                    <div class="floating-card project-card tilt-card bg-[#101028] rounded-2xl overflow-hidden glow">
+                        <div class="h-64 bg-gradient-to-br from-[#ff003c] to-[#9d00ff] opacity-80"></div>
+                        <div class="project-overlay">
+                            <h3 class="text-2xl font-bold mb-2">ConversaTrait</h3>
+                            <p class="text-gray-300 mb-4">Personality and Sociological AI Analysis Suite</p>
+                            <a href="#" class="text-[#00d9ff] hover:underline">Learn More</a>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-3xl font-bold mb-6 gradient-text">ConversaTrait</h3>
+                        <p class="mb-4">An advanced AI personality analysis platform with 17 specialized modes for decoding human communication patterns.</p>
+                        <ul class="mb-6 space-y-2">
+                            <li class="flex items-start">
+                                <span class="text-[#00d9ff] mr-2">▶</span>
+                                <span>Bullshit Detector: Identifies deception in written communications</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-[#00d9ff] mr-2">▶</span>
+                                <span>Hidden Talent Finder: Discovers latent abilities from communication patterns</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-[#00d9ff] mr-2">▶</span>
+                                <span>Romantic Attraction Indicator: Decodes social cues for those on the spectrum</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-[#00d9ff] mr-2">▶</span>
+                                <span>Career Advisor: Provides personalized career guidance based on communication style</span>
+                            </li>
+                        </ul>
+                        <div class="pulse inline-block px-6 py-2 bg-[#ff003c] rounded-full text-white font-bold">
+                            BETA TESTING NOW UNDERWAY
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Acceptbl.com -->
+            <div class="mb-32">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
+                    <div class="order-2 lg:order-1">
+                        <h3 class="text-3xl font-bold mb-6 gradient-text">Acceptbl.com</h3>
+                        <p class="mb-4">AI consulting focused on identifying novel revenue streams, optimizing operations, and implementing cutting-edge AI solutions.</p>
+                        <p class="mb-6">Revolutionized character generation for a client by developing a novel LoRA training approach that reduced costs from $28.2M to just $1.50 while maintaining artistic integrity and diversity.</p>
+                        <div class="text-xl font-bold text-[#00d9ff]">"Change what's acceptbl to you"</div>
+                    </div>
+                    <div class="floating-card project-card tilt-card bg-[#101028] rounded-2xl overflow-hidden glow order-1 lg:order-2">
+                        <div class="h-64 bg-gradient-to-br from-[#00d9ff] to-[#9d00ff] opacity-80"></div>
+                        <div class="project-overlay">
+                            <h3 class="text-2xl font-bold mb-2">Acceptbl.com</h3>
+                            <p class="text-gray-300 mb-4">AI Consulting & Integration</p>
+                            <a href="#" class="text-[#00d9ff] hover:underline">Learn More</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sixtymin.site -->
+            <div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div class="floating-card project-card tilt-card bg-[#101028] rounded-2xl overflow-hidden glow">
+                        <div class="h-64 bg-gradient-to-br from-[#ff003c] to-[#00d9ff] opacity-80"></div>
+                        <div class="project-overlay">
+                            <h3 class="text-2xl font-bold mb-2">Sixtymin.site</h3>
+                            <p class="text-gray-300 mb-4">Rapid Web Development</p>
+                            <a href="#" class="text-[#00d9ff] hover:underline">Learn More</a>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-3xl font-bold mb-6 gradient-text">Sixtymin.site</h3>
+                        <p class="mb-4">A web development service that builds complete single-page websites in 60 minutes or it's free.</p>
+                        <p class="mb-6">Live development sessions with countdown timer - if I don't deliver your completed website within 60 minutes, you pay nothing.</p>
+                        <div class="text-2xl font-bold text-[#ff003c]">$495 - 60 Minutes - Or It's Free</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Experience Section -->
+    <section id="experience" class="py-20 relative overflow-hidden">
+        <div class="animated-bg"></div>
+        <div class="container mx-auto px-6 z-10">
+            <h2 class="text-4xl font-bold mb-16 text-center section-title">EXPERIENCE</h2>
+            
+            <div class="max-w-4xl mx-auto">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="floating-card bg-[#101028] p-8 rounded-2xl mb-8 glow">
+                        <h3 class="text-2xl font-bold mb-2 gradient-text">Business Operations Director</h3>
+                        <div class="text-[#00d9ff] mb-4">10 Years of International Management Experience</div>
+                        <p class="mb-4">Directed 5 departments in day-to-day operations while overseeing 4 additional international departments across Jamaica, Qatar, Tijuana, and the Philippines.</p>
+                        <p class="mb-4">Managed customer care, support, and relations for a network of 2 dozen offices across the country while based at headquarters in Van Nuys, CA.</p>
+                        <p>Consistently delivered top-performing departments, leading to being flown to Ocean, NJ to implement operational improvements across their offices.</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="floating-card bg-[#101028] p-8 rounded-2xl mb-8 glow">
+                        <h3 class="text-2xl font-bold mb-2 gradient-text">Touring Musician</h3>
+                        <div class="text-[#00d9ff] mb-4">Warped Tour 2007 Artist</div>
+                        <p class="mb-4">Performed as a thrash metal drummer on the iconic Warped Tour, developing discipline, performance skills, and the ability to connect with diverse audiences.</p>
+                        <p>Licensed music to Fox for use in a prime-time episode of Bones (Season 4, Episode 20: "Mayhem on a Cross").</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Education Section -->
+    <section id="education" class="py-20 relative overflow-hidden">
+        <div class="animated-bg"></div>
+        <div class="container mx-auto px-6 z-10">
+            <h2 class="text-4xl font-bold mb-16 text-center section-title">EDUCATION</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="floating-card tilt-card bg-[#101028] p-6 rounded-2xl text-center glow">
+                    <h3 class="text-xl font-bold mb-4 gradient-text">California State University, Northridge</h3>
+                    <div class="text-[#00d9ff] mb-2">2022 - 2025</div>
+                    <p>BS, Marketing & Business Administration</p>
+                </div>
+                
+                <div class="floating-card tilt-card bg-[#101028] p-6 rounded-2xl text-center glow">
+                    <h3 class="text-xl font-bold mb-4 gradient-text">Los Angeles Pierce College</h3>
+                    <div class="text-[#00d9ff] mb-2">2021 - 2023</div>
+                    <p>2x AS, 2x AA in Systems Operations Management, General STEM Studies, Sociology</p>
+                </div>
+                
+                <div class="floating-card tilt-card bg-[#101028] p-6 rounded-2xl text-center glow">
+                    <h3 class="text-xl font-bold mb-4 gradient-text">Musician's Institute</h3>
+                    <div class="text-[#00d9ff] mb-2">2005 - 2007</div>
+                    <p>AA in Music Business, Percussion, Live Performance, Arrangement</p>
+                </div>
+                
+                <div class="floating-card tilt-card bg-[#101028] p-6 rounded-2xl text-center glow">
+                    <h3 class="text-xl font-bold mb-4 gradient-text">Berklee College of Music</h3>
+                    <div class="text-[#00d9ff] mb-2">2004 - 2005</div>
+                    <p>Advanced Certificate in Drumset, Harmony Theory, Ear Training, Composition</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 relative overflow-hidden">
+        <div class="animated-bg"></div>
+        <div class="container mx-auto px-6 z-10">
+            <h2 class="text-4xl font-bold mb-16 text-center section-title">GET IN TOUCH</h2>
+            
+            <div class="max-w-2xl mx-auto">
+                <div class="floating-card bg-[#101028] p-8 rounded-2xl glow">
+                    <form id="contact-form" class="space-y-6">
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-gray-300 mb-2">Name</label>
+                            <input type="text" id="name" class="w-full px-4 py-3 bg-[#0a0a18] border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00d9ff] text-white" required>
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                            <input type="email" id="email" class="w-full px-4 py-3 bg-[#0a0a18] border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00d9ff] text-white" required>
+                        </div>
+                        <div>
+                            <label for="message" class="block text-sm font-medium text-gray-300 mb-2">Message</label>
+                            <textarea id="message" rows="5" class="w-full px-4 py-3 bg-[#0a0a18] border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00d9ff] text-white" required></textarea>
+                        </div>
+                        <button type="submit" class="w-full py-3 bg-gradient-to-r from-[#ff003c] to-[#9d00ff] rounded-lg text-white font-bold hover:shadow-lg hover:shadow-[#ff003c]/50 transition-all">SEND MESSAGE</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="py-12 border-t border-gray-800">
+        <div class="container mx-auto px-6 text-center">
+            <div class="flex justify-center space-x-8 mb-8">
+                <a href="#" class="text-2xl text-gray-400 hover:text-[#ff003c] transition-colors">
+                    <i class="fab fa-linkedin"></i>
+                </a>
+                <a href="#" class="text-2xl text-gray-400 hover:text-[#00d9ff] transition-colors">
+                    <i class="fab fa-github"></i>
+                </a>
+                <a href="#" class="text-2xl text-gray-400 hover:text-[#9d00ff] transition-colors">
+                    <i class="fab fa-twitter"></i>
+                </a>
+            </div>
+            <p class="text-gray-500">© 2023 Chad Keith. All rights reserved.</p>
+        </div>
+    </footer>
+    
+    <script>
+        // Initialize GSAP ScrollTrigger
+        gsap.registerPlugin(ScrollTrigger);
+        
+        // Custom cursor
+        document.addEventListener('mousemove', (e) => {
+            const cursor = document.querySelector('.custom-cursor');
+            const follower = document.querySelector('.cursor-follower');
+            
+            gsap.to(cursor, {
+                x: e.clientX,
+                y: e.clientY,
+                duration: 0.1
+            });
+            
+            gsap.to(follower, {
+                x: e.clientX,
+                y: e.clientY,
+                duration: 0.3
+            });
+        });
+        
+        // Click effect on cursor
+        document.addEventListener('mousedown', () => {
+            const cursor = document.querySelector('.custom-cursor');
+            const follower = document.querySelector('.cursor-follower');
+            
+            gsap.to(cursor, {
+                scale: 0.8,
+                duration: 0.1
+            });
+            
+            gsap.to(follower, {
+                scale: 1.2,
+                duration: 0.1
+            });
+        });
+        
+        document.addEventListener('mouseup', () => {
+            const cursor = document.querySelector('.custom-cursor');
+            const follower = document.querySelector('.cursor-follower');
+            
+            gsap.to(cursor, {
+                scale: 1,
+                duration: 0.1
+            });
+            
+            gsap.to(follower, {
+                scale: 1,
+                duration: 0.1
+            });
+        });
+        
+        // Hover effects on links
+        const links = document.querySelectorAll('a, button');
+        links.forEach(link => {
+            link.addEventListener('mouseenter', () => {
+                const cursor = document.querySelector('.custom-cursor');
+                gsap.to(cursor, {
+                    scale: 1.5,
+                    duration: 0.2
+                });
+            });
+            
+            link.addEventListener('mouseleave', () => {
+                const cursor = document.querySelector('.custom-cursor');
+                gsap.to(cursor, {
+                    scale: 1,
+                    duration: 0.2
+                });
+            });
+        });
+        
+        // Initialize particles.js
+        particlesJS('particles-js', {
+            particles: {
+                number: {
+                    value: 100,
+                    density: {
+                        enable: true,
+                        value_area: 800
+                    }
+                },
+                color: {
+                    value: ["#ff003c", "#00d9ff", "#9d00ff"]
+                },
+                shape: {
+                    type: "circle",
+                    stroke: {
+                        width: 0,
+                        color: "#000000"
+                    }
+                },
+                opacity: {
+                    value: 0.5,
+                    random: true,
+                    anim: {
+                        enable: true,
+                        speed: 1,
+                        opacity_min: 0.1,
+                        sync: false
+                    }
+                },
+                size: {
+                    value: 3,
+                    random: true,
+                    anim: {
+                        enable: true,
+                        speed: 2,
+                        size_min: 0.3,
+                        sync: false
+                    }
+                },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: "#ffffff",
+                    opacity: 0.4,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 2,
+                    direction: "none",
+                    random: true,
+                    straight: false,
+                    out_mode: "out",
+                    bounce: false,
+                    attract: {
+                        enable: false,
+                        rotateX: 600,
+                        rotateY: 1200
+                    }
+                }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: {
+                        enable: true,
+                        mode: "grab"
+                    },
+                    onclick: {
+                        enable: true,
+                        mode: "push"
+                    },
+                    resize: true
+                },
+                modes: {
+                    grab: {
+                        distance: 140,
+                        line_linked: {
+                            opacity: 1
+                        }
+                    },
+                    push: {
+                        particles_nb: 4
+                    }
+                }
+            },
+            retina_detect: true
+        });
+        
+        // Initialize Three.js background
+        function initThreeJS() {
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.getElementById('three-bg').appendChild(renderer.domElement);
+            
+            // Create particles
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particlesCount = 5000;
+            
+            const posArray = new Float32Array(particlesCount * 3);
+            const colorArray = new Float32Array(particlesCount * 3);
+            
+            for (let i = 0; i < particlesCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 10;
+                colorArray[i] = Math.random();
+            }
+            
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 3));
+            
+            const particlesMaterial = new THREE.PointsMaterial({
+                size: 0.02,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.8
+            });
+            
+            const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particlesMesh);
+            
+            camera.position.z = 5;
+            
+            // Mouse movement
+            let mouseX = 0;
+            let mouseY = 0;
+            
+            document.addEventListener('mousemove', (event) => {
+                mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+                mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+            });
+            
+            // Animation
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                particlesMesh.rotation.x += 0.0005;
+                particlesMesh.rotation.y += 0.0005;
+                
+                camera.position.x += (mouseX * 2 - camera.position.x) * 0.01;
+                camera.position.y += (mouseY * 2 - camera.position.y) * 0.01;
+                camera.lookAt(scene.position);
+                
+                renderer.render(scene, camera);
+            }
+            
+            animate();
+            
+            // Resize handler
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+        
+        // Initialize Three.js
+        initThreeJS();
+        
+        // Initialize Vanilla Tilt
+        VanillaTilt.init(document.querySelectorAll('.tilt-card'), {
+            max: 5,
+            speed: 400,
+            glare: true,
+            "max-glare": 0.2,
+        });
+        
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('-translate-y-full');
+        });
+        
+        // Close mobile menu when clicking a link
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('-translate-y-full');
+            });
+        });
+        
+        // GSAP animations for elements on scroll
+        gsap.utils.toArray('.floating-card, .section-title').forEach(element => {
+            gsap.fromTo(element, {
+                opacity: 0,
+                y: 50
+            }, {
+                opacity: 1,
+                y: 0,
+                duration: 1,
+                scrollTrigger: {
+                    trigger: element,
+                    start: 'top 85%',
+                    toggleActions: 'play none none none'
+                }
+            });
+        });
+        
+        // Form submission
+        document.getElementById('contact-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // In a real implementation, you would handle form submission here
+            alert('Thank you for your message! In a real implementation, this would send your message.');
+            this.reset();
+        });
+    </script>
+    
+    <!-- Font Awesome Kit -->
+    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
+</body>
+</html>
